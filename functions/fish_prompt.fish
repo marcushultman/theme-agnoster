@@ -355,6 +355,15 @@ end
 
 
 function prompt_status -d "the symbols for a non zero exit status, root and background jobs"
+
+    if test (date +%u) -eq 5; and test (date +%k) -lt 15;
+      prompt_segment $color_status_nonzero_bg $color_status_nonzero_str 🐸
+    end
+
+    if test (date +%u) -eq 5; and test (date +%k) -ge 15; or test (date +%u) -gt 5;
+      prompt_segment $color_status_nonzero_bg $color_status_nonzero_str 🍻
+    end
+
     if [ $RETVAL -ne 0 ]
       prompt_segment $color_status_nonzero_bg $color_status_nonzero_str $glyph_status_nonzero
     end

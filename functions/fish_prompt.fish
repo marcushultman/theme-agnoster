@@ -268,9 +268,9 @@ function prompt_dir -d "Display the current directory"
   set dir (prompt_pwd)
   switch $dir
     case "*ghe.spotify.net*"
-      prompt_segment $color_dir_bg $color_dir_str (string replace -r ".*/ghe.spotify.net" "\uf1bc\u00A0" $dir)
+      prompt_segment $color_dir_bg $color_dir_str (string replace -r ".*/ghe.spotify.net" \UF1BC\u00A0 $dir)
     case '*github.com*'
-      prompt_segment $color_dir_bg $color_dir_str (string replace -r ".*/github.com" "\uf09b\u00A0" $dir)
+      prompt_segment $color_dir_bg $color_dir_str (string replace -r ".*/github.com" \UF09B\u00A0 $dir)
     case '*'
       prompt_segment $color_dir_bg $color_dir_str $dir
   end

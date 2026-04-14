@@ -277,6 +277,75 @@ function prompt_dir -d "Display the current directory"
 end
 
 
+function prompt_bazel_platform -d "Display configured Bazel target platform"
+  set -l git_root (command git rev-parse --show-toplevel 2>/dev/null)
+  or return
+
+  set -l bazelrc "$git_root/.spotify/core.bazelrc"
+  test -f "$bazelrc"; or return
+
+  set -l meta_line (command head -1 "$bazelrc")
+  string match -q "# core-configure: *" $meta_line; or return
+
+  set -l json (string replace "# core-configure: " "" $meta_line)
+  set -l os_val (string match -r '"os":"([^"]*)"' $json)[2]
+  set -l cpu_val (string match -r '"cpu":"([^"]*)"' $json)[2]
+  set -l cfg_val (string match -r '"cfg":"([^"]*)"' $json)[2]
+  set -l client_val (string match -r '"client":"([^"]*)"' $json)[2]
+
+  set -l icon
+  set -l bg_color
+  set -l fg_color
+
+  # Icon + color per client, then per OS
+  if test "$client_val" = desktop
+    set bg_color FF8C00
+    set fg_color black
+    switch $os_val
+      case osx
+        set icon \uF179
+      case windows
+        set icon \uF17A
+      case linux
+        set icon \uF17C
+      case '*'
+        set icon \uF108
+    end
+  else if test "$client_val" = spim
+    set bg_color 1A1A1A
+    set fg_color 00FF00
+    set icon \uF489
+  else
+    switch $os_val
+      case ios
+        set icon \uF179
+        set bg_color 007AFF
+        set fg_color white
+      case osx
+        set icon \uF179
+        set bg_color 555555
+        set fg_color white
+      case android
+        set icon \uF17B
+        set bg_color 3DDC84
+        set fg_color black
+      case windows
+        set icon \uF17A
+        set bg_color 555555
+        set fg_color white
+      case linux
+        set icon \uF17C
+        set bg_color 555555
+        set fg_color white
+      case '*'
+        return
+    end
+  end
+
+  prompt_segment $bg_color $fg_color $icon
+end
+
+
 function prompt_hg -d "Display mercurial state"
   not set -l root (fish_print_hg_root); and return
 
@@ -393,6 +462,7 @@ function fish_prompt
   prompt_status
   prompt_user
   prompt_dir
+  prompt_bazel_platform
   prompt_virtual_env
   if [ (cwd_in_scm_blacklist | wc -c) -eq 0 ]
     type -q git; and prompt_git
